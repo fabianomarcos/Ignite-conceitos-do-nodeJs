@@ -11,7 +11,7 @@ app.use(express.json());
 const users = [];
 
 function checksExistsUserAccount(request, response, next) {
-  const { username } = request.header;
+  const { username } = request.headers;
 
   const user = users.find((userF) => userF.username === username);
 
@@ -40,6 +40,8 @@ app.post('/users', (request, response) => {
 
   return response.status(201).json(user);
 });
+
+app.get('/users', (request, response) => response.status(200).json(users));
 
 app.get('/todos', checksExistsUserAccount, (request, response) => {
   const { user } = request;
@@ -89,14 +91,14 @@ app.patch('/todos/:id/done', checksExistsUserAccount, (request, response) => {
 
   todo.done = !todo.done;
 
-  return response.status(201).json(todo);
+  return response.json(todo);
 });
 
 app.delete('/todos/:id', checksExistsUserAccount, (request, response) => {
   const { user } = request;
   const { id } = request.params;
 
-  const indexTodo = user.todos.findIndex((todoItem) => todoItem.id !== id);
+  const indexTodo = user.todos.findIndex((todoItem) => todoItem.id === id);
 
   if (indexTodo === -1) return response.status(404).json({ error: 'Todo not found!' });
 
